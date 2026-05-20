@@ -6,8 +6,9 @@ import streamlit.components.v1 as components
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from lib.tts import VOICES, SPEED_PRESETS, audio_html, get_cached_audio
+from lib.user import require_user
 
-st.set_page_config(page_title="🔤 Hangul", page_icon="🔤", layout="centered", initial_sidebar_state="expanded")
+st.set_page_config(page_title="🔤 Hangul", page_icon="🔤", layout="centered", initial_sidebar_state="collapsed")
 
 # ── Daten ─────────────────────────────────────────────────────────────────────
 CONSONANTS = [
@@ -66,17 +67,161 @@ SYLLABLES = [
 # ── CSS ───────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
+html, body, [class*="css"] {
+    font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Noto Sans KR', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+}
+.block-container {
+    padding: .8rem .9rem 2rem .9rem !important;
+    max-width: 760px !important;
+}
+@supports (padding: max(0px)) {
+    .block-container {
+        padding-bottom: max(2rem, env(safe-area-inset-bottom)) !important;
+    }
+}
+.back-link {
+    font-size: .8rem; color: #495057; text-decoration: none !important;
+    display: inline-block; padding: 4px 0; margin-bottom: .4rem;
+}
+.page-title {
+    font-size: 1.3rem; font-weight: 800; margin: 0 0 .15rem; letter-spacing: -.01em;
+    color: #c2255c;
+}
+.page-sub { font-size: .8rem; color: #868e96; margin: 0 0 .8rem; }
+.stButton > button {
+    width: 100%; min-height: 44px;
+    border-radius: 12px; font-weight: 600;
+}
 .hangul-char { font-size:5rem; font-weight:700; text-align:center; line-height:1.1;
                margin:.5rem 0; color:#e64980; }
 .rom-text    { font-size:1.8rem; text-align:center; color:#845ef7; font-weight:600; }
-.desc-text   { font-size:1.1rem; text-align:center; color:#555; margin:.5rem 0; }
-.fc-hangul   { background:#fff0f6; border:3px solid #e64980; border-radius:20px;
-               padding:2.5rem 2rem; text-align:center; min-height:260px;
-               display:flex; flex-direction:column; justify-content:center; }
+.desc-text   { font-size:1.05rem; text-align:center; color:#555; margin:.5rem 0; }
+.fc-hangul   { background:linear-gradient(135deg,#fff5f9,#fce4ec); border:2px solid #e64980; border-radius:18px;
+               padding:2rem 1.5rem; text-align:center; min-height:240px;
+               display:flex; flex-direction:column; justify-content:center;
+               box-shadow:0 4px 16px rgba(230,73,128,.15); }
+@media (max-width: 480px) {
+    .block-container { padding-left: .65rem !important; padding-right: .65rem !important; }
+    .page-title { font-size: 1.15rem; }
+    .hangul-char { font-size: 4rem; }
+    .rom-text { font-size: 1.4rem; }
+    .desc-text { font-size: .95rem; }
+    .fc-hangul { padding: 1.5rem 1rem; min-height: 200px; }
+}
 @media (prefers-color-scheme: dark) {
-    .fc-hangul { background:#2a1525; border-color:#f06595; }
+    .back-link { color: #adb5bd; }
+    .page-title { color: #faa2c1; }
+    .page-sub { color: #6c757d; }
+    .fc-hangul { background:linear-gradient(135deg,#2a1525,#3a1a2c); border-color:#f06595; }
     .hangul-char { color:#f06595; }
+    .rom-text { color:#d0bfff; }
     .desc-text { color:#adb5bd; }
+}
+
+/* ── Streamlit chrome ─────────────────────────────────── */
+#MainMenu, footer { visibility: hidden; height: 0; }
+
+/* ── Übersicht: info + grid + detail ──────────────────── */
+.info-box {
+    background: linear-gradient(135deg, #fff5f9, #f3f0ff);
+    border: 1px solid #fcc2d7; border-radius: 12px;
+    padding: .65rem .85rem; margin: .3rem 0 .9rem;
+    font-size: .82rem; line-height: 1.5; color: #5f3dc4;
+}
+.section-h-h {
+    font-size: .82rem; font-weight: 700; margin: 1rem 0 .5rem;
+    color: #495057; display: flex; align-items: center;
+    justify-content: space-between; letter-spacing: -.005em;
+}
+.section-h-h .sh-aside {
+    font-size: .68rem; color: #adb5bd; font-weight: 600;
+    background: #f1f3f5; padding: 2px 8px; border-radius: 100px;
+}
+
+/* Grid buttons — kompakte 5er-Reihen */
+div[data-testid="stHorizontalBlock"]:has(.ov-mark) [data-testid="stButton"] > button {
+    aspect-ratio: 1 !important;
+    padding: 0 !important; min-height: 0 !important;
+    font-size: 1.4rem !important; font-weight: 700 !important;
+    border-radius: 12px !important;
+    border: 1.5px solid #dee2e6 !important;
+    background: #fff !important; color: #495057 !important;
+    transition: transform .12s ease, border-color .12s, background .12s;
+}
+div[data-testid="stHorizontalBlock"]:has(.ov-mark) [data-testid="stButton"] > button:hover {
+    border-color: #845ef7 !important; background: #f3f0ff !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.ov-mark) [data-testid="stButton"] > button:active {
+    transform: scale(.92);
+}
+.ov-mark { display: none; }
+.ov-rom {
+    text-align: center; font-size: .65rem; color: #868e96;
+    margin: 3px 0 0; font-weight: 600; font-style: italic;
+    letter-spacing: -.02em;
+}
+
+.ov-detail {
+    margin: .9rem 0 .5rem;
+    border-radius: 16px; padding: 1.1rem 1rem;
+    background: linear-gradient(135deg, #fff5f9, #fce4ec);
+    border: 2px solid #e64980; text-align: center;
+    box-shadow: 0 4px 16px rgba(230, 73, 128, .12);
+}
+.ov-detail-char {
+    font-size: 4.5rem; font-weight: 800; color: #c2255c;
+    line-height: 1; margin-bottom: .15rem;
+}
+.ov-detail-rom {
+    font-size: 1.1rem; color: #845ef7; font-weight: 700;
+    margin-bottom: .35rem; font-style: italic;
+}
+.ov-detail-desc { font-size: .88rem; color: #495057; line-height: 1.5; }
+
+.syl-demo { display: grid; gap: .35rem; margin-top: .3rem; }
+.syl-ex {
+    background: #f8f9fa; border: 1px solid #e9ecef;
+    border-radius: 10px; padding: .5rem .75rem;
+    font-size: .88rem; display: flex; align-items: center;
+    gap: .3rem; flex-wrap: wrap;
+}
+.syl-big   { font-size: 1.6rem; font-weight: 800; color: #1864ab; margin-right: .25rem; }
+.syl-plus  { color: #adb5bd; font-weight: 600; }
+.syl-arr   { color: #845ef7; font-weight: 700; margin: 0 .15rem; }
+.syl-rom   { font-style: italic; color: #845ef7; font-weight: 600; }
+
+@media (max-width: 480px) {
+    div[data-testid="stHorizontalBlock"]:has(.ov-mark) [data-testid="stButton"] > button {
+        font-size: 1.2rem !important;
+    }
+    .ov-detail-char { font-size: 3.8rem; }
+    .ov-detail-rom  { font-size: 1rem; }
+    .ov-detail-desc { font-size: .82rem; }
+    .syl-big { font-size: 1.4rem; }
+    .syl-ex  { font-size: .82rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+    .info-box { background: linear-gradient(135deg,#2a1525,#231a35); border-color:#5f3dc4; color:#d0bfff; }
+    .section-h-h { color: #ced4da; }
+    .section-h-h .sh-aside { background: #2a2f36; color: #6c757d; }
+    div[data-testid="stHorizontalBlock"]:has(.ov-mark) [data-testid="stButton"] > button {
+        background: #1a1f26 !important; color: #ced4da !important;
+        border-color: #343a40 !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.ov-mark) [data-testid="stButton"] > button:hover {
+        background: #2a1f3e !important; border-color: #845ef7 !important;
+    }
+    .ov-rom { color: #6c757d; }
+    .ov-detail { background: linear-gradient(135deg,#2a1525,#3a1a2c); border-color:#e64980; }
+    .ov-detail-char { color: #fcc2d7; }
+    .ov-detail-rom  { color: #d0bfff; }
+    .ov-detail-desc { color: #ced4da; }
+    .syl-ex { background: #1a1f26; border-color: #2a2f36; color: #ced4da; }
+    .syl-big { color: #74c0fc; }
+    .syl-arr, .syl-rom { color: #d0bfff; }
 }
 /* Flip-Overlay */
 [data-testid="stVerticalBlock"]:has(.fc-hangul) { position:relative !important; }
@@ -124,73 +269,86 @@ with st.sidebar:
     - Lese-Reihenfolge: links → rechts, oben → unten
     """)
 
+# ── User gate ─────────────────────────────────────────────────────────────────
+user = require_user()
+
 # ── Hauptinhalt ───────────────────────────────────────────────────────────────
-st.title("🔤 한글 연습 — Hangul lernen")
-st.caption("Das koreanische Alphabet — 14 Konsonanten + 10 Vokale = unbegrenzte Silben")
+st.markdown('<a class="back-link" href="/" target="_self">← Zurück</a>', unsafe_allow_html=True)
+st.markdown('<h1 class="page-title">🔤 한글 연습 · Hangul</h1>', unsafe_allow_html=True)
+st.markdown(f'<p class="page-sub">Hi {user["name"]} · 14 Konsonanten + 10 Vokale</p>', unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Übersicht", "자음 Konsonanten", "모음 Vokale", "🃏 Karten-Übung", "✍️ Schreiben"])
+tab1, tab4, tab5 = st.tabs(["📊 Übersicht", "🃏 Karten", "✍️ Schreiben"])
 
-# ── Tab 1: Übersicht ──────────────────────────────────────────────────────────
+# ── Tab 1: Übersicht — kompaktes Grid + Detail ───────────────────────────────
 with tab1:
-    st.subheader("Das Hangul-System")
+    st.session_state.setdefault("hangul_selected", "ㄱ")
+
+    st.markdown(
+        '<div class="info-box">'
+        '<b>한글</b> · 1443 vom König <b>Sejong</b> · jedes Zeichen spiegelt '
+        'Mund-/Zungenstellung wider. Silbe = Quadrat.'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+    def _ov_grid(chunks, prefix):
+        for chunk in chunks:
+            st.markdown('<div class="ov-mark"></div>', unsafe_allow_html=True)
+            cols = st.columns(5)
+            for i in range(5):
+                with cols[i]:
+                    if i < len(chunk):
+                        c, r, _ = chunk[i]
+                        if st.button(c, key=f"{prefix}_{c}", use_container_width=True):
+                            st.session_state.hangul_selected = c
+                            st.rerun()
+                        st.markdown(f'<div class="ov-rom">[{r}]</div>', unsafe_allow_html=True)
+                    else:
+                        st.markdown("&nbsp;", unsafe_allow_html=True)
+
+    st.markdown(
+        '<div class="section-h-h">🔥 자음 · Konsonanten <span class="sh-aside">19</span></div>',
+        unsafe_allow_html=True,
+    )
+    _ov_grid([CONSONANTS[i:i+5] for i in range(0, len(CONSONANTS), 5)], "ovc")
+
+    st.markdown(
+        '<div class="section-h-h">🌊 모음 · Vokale <span class="sh-aside">15</span></div>',
+        unsafe_allow_html=True,
+    )
+    _ov_grid([VOWELS[i:i+5] for i in range(0, len(VOWELS), 5)], "ovv")
+
+    # ── Detail box for the selected character ────────────────────────────────
+    sel  = st.session_state.hangul_selected
+    info = next((t for t in CONSONANTS + VOWELS if t[0] == sel), None)
+    if info:
+        c, r, d = info
+        st.markdown(f"""
+        <div class="ov-detail">
+            <div class="ov-detail-char">{c}</div>
+            <div class="ov-detail-rom">[{r}]</div>
+            <div class="ov-detail-desc">{d}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("🔊 Aussprechen", use_container_width=True, key="ov_tts"):
+            try:
+                ab = get_cached_audio(c, voice, rate)
+                st.markdown(audio_html(ab, compact=True), unsafe_allow_html=True)
+            except Exception as e:
+                st.error(str(e))
+
+    # ── Silbenstruktur — kompakt ─────────────────────────────────────────────
+    st.markdown(
+        '<div class="section-h-h">🧩 음절 구조 · Silbenaufbau</div>',
+        unsafe_allow_html=True,
+    )
     st.markdown("""
-    Hangul (한글) wurde **1443** vom koreanischen König Sejong erfunden.
-    Es ist eines der **wissenschaftlichsten Schriftsysteme** der Welt — jedes Zeichen
-    spiegelt die Mund- und Zungenstellung beim Sprechen wider.
-
-    **Silbenstruktur:**
-    ```
-    한 = ㅎ (h) + ㅏ (a) + ㄴ (n) = "han"
-    국 = ㄱ (g) + ㅜ (u) + ㄱ (k) = "guk"
-    ```
-    """)
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown("#### 자음 (Konsonanten) — 14 Grundzeichen")
-        rows = [CONSONANTS[i:i+5] for i in range(0, 14, 5)] + [CONSONANTS[14:]]
-        for row in rows:
-            cols = st.columns(len(row))
-            for col, (char, rom, _) in zip(cols, row):
-                col.markdown(f"<div style='text-align:center;font-size:2rem;font-weight:700;color:#e64980'>{char}</div>"
-                             f"<div style='text-align:center;font-size:.85rem;color:#845ef7'>[{rom}]</div>", unsafe_allow_html=True)
-    with c2:
-        st.markdown("#### 모음 (Vokale) — 10 Grundzeichen")
-        rows = [VOWELS[:5], VOWELS[5:10]]
-        for row in rows:
-            cols = st.columns(len(row))
-            for col, (char, rom, _) in zip(cols, row):
-                col.markdown(f"<div style='text-align:center;font-size:2rem;font-weight:700;color:#339af0'>{char}</div>"
-                             f"<div style='text-align:center;font-size:.85rem;color:#1971c2'>[{rom}]</div>", unsafe_allow_html=True)
-
-# ── Tab 2: Konsonanten ────────────────────────────────────────────────────────
-with tab2:
-    st.subheader("자음 — Konsonanten")
-    for char, rom, desc in CONSONANTS:
-        with st.expander(f"**{char}** — [{rom}]"):
-            c1, c2 = st.columns([1, 3])
-            c1.markdown(f"<div style='font-size:5rem;text-align:center;color:#e64980'>{char}</div>", unsafe_allow_html=True)
-            c2.markdown(f"**Aussprache:** [{rom}]  \n{desc}")
-            if c2.button("🔊 Hören", key=f"con_{char}"):
-                try:
-                    ab = get_cached_audio(char, voice, rate)
-                    c2.markdown(audio_html(ab, compact=True), unsafe_allow_html=True)
-                except Exception as e:
-                    c2.error(str(e))
-
-# ── Tab 3: Vokale ─────────────────────────────────────────────────────────────
-with tab3:
-    st.subheader("모음 — Vokale")
-    for char, rom, desc in VOWELS:
-        with st.expander(f"**{char}** — [{rom}]"):
-            c1, c2 = st.columns([1, 3])
-            c1.markdown(f"<div style='font-size:5rem;text-align:center;color:#339af0'>{char}</div>", unsafe_allow_html=True)
-            c2.markdown(f"**Aussprache:** [{rom}]  \n{desc}")
-            if c2.button("🔊 Hören", key=f"vow_{char}"):
-                try:
-                    ab = get_cached_audio(char, voice, rate)
-                    c2.markdown(audio_html(ab, compact=True), unsafe_allow_html=True)
-                except Exception as e:
-                    c2.error(str(e))
+    <div class="syl-demo">
+        <div class="syl-ex"><span class="syl-big">한</span>= ㅎ <span class="syl-plus">+</span> ㅏ <span class="syl-plus">+</span> ㄴ <span class="syl-arr">→</span> <span class="syl-rom">han</span></div>
+        <div class="syl-ex"><span class="syl-big">국</span>= ㄱ <span class="syl-plus">+</span> ㅜ <span class="syl-plus">+</span> ㄱ <span class="syl-arr">→</span> <span class="syl-rom">guk</span></div>
+        <div class="syl-ex"><span class="syl-big">말</span>= ㅁ <span class="syl-plus">+</span> ㅏ <span class="syl-plus">+</span> ㄹ <span class="syl-arr">→</span> <span class="syl-rom">mal</span></div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ── Tab 4: Kartenübung ────────────────────────────────────────────────────────
 with tab4:
@@ -283,7 +441,7 @@ body{font-family:-apple-system,sans-serif;background:transparent;padding:10px;co
 .mode-tabs{display:flex;gap:8px;margin-bottom:10px}
 .mbtn{padding:5px 16px;border-radius:20px;border:2px solid #e64980;background:#fff;color:#e64980;font-weight:600;cursor:pointer;font-size:.88rem}
 .mbtn.active{background:#e64980;color:#fff}
-.char-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;max-height:140px;overflow-y:auto;padding:4px}
+.char-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;max-height:280px;overflow-y:auto;padding:4px}
 .cbtn{width:44px;height:44px;border-radius:10px;border:2px solid #dee2e6;background:#fff;font-size:1.45rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cbtn.sel{border-color:#339af0;background:#e7f5ff;color:#1864ab}
 .cbtn:hover{border-color:#74c0fc;background:#f0f9ff}
@@ -301,6 +459,42 @@ canvas{border:2px solid #dee2e6;border-radius:12px;display:block;max-width:100%;
 #si{font-size:.82rem;color:#666;flex:1;text-align:center}
 .clrbtn{margin-top:7px;padding:4px 14px;border-radius:8px;border:1px solid #ff6b6b;background:#fff;color:#ff6b6b;cursor:pointer;font-size:.82rem;width:100%}
 .clrbtn:hover{background:#fff5f5}
+@media (max-width:480px){
+  body{padding:6px}
+  .rules{padding:8px 10px}
+  .rule{font-size:.72rem;padding:4px 8px}
+  .rules h3{font-size:.86rem;margin-bottom:6px}
+  .mbtn{font-size:.8rem;padding:4px 12px}
+  .cbtn{width:40px;height:40px;font-size:1.3rem}
+  .practice-area{gap:10px}
+  .clabel{font-size:.82rem}
+  .char-disp{font-size:1.05rem}
+  .sbtn{font-size:.78rem;padding:4px 8px}
+  .cnavbtn{font-size:.82rem;padding:5px 10px}
+}
+@media (prefers-color-scheme:dark){
+  body{color:#ced4da}
+  .rules{background:#3a3017;border-color:#f59f00}
+  .rules h3{color:#ffd43b}
+  .rule{background:#1a1f26;color:#ffd43b;border-color:#5a4519}
+  .mbtn{background:#1a1f26;color:#fcc2d7;border-color:#e64980}
+  .mbtn.active{background:#e64980;color:#fff}
+  .cbtn{background:#1a1f26;color:#ced4da;border-color:#343a40}
+  .cbtn.sel{background:#0f2942;color:#74c0fc;border-color:#339af0}
+  .cbtn:hover{background:#2a1f3e;border-color:#845ef7}
+  #dc{background:#0f1419;border-color:#339af0}
+  #pc{background:#0f1f15;border-color:#51cf66}
+  .sbtn{background:#1a1f26;color:#ced4da;border-color:#343a40}
+  .sbtn:hover{background:#2a2f36}
+  .sbtn.pr{background:#339af0;color:#fff;border-color:#339af0}
+  .clrbtn{background:#1a1f26;color:#ff8787;border-color:#ff6b6b}
+  .clrbtn:hover{background:#3a1a1a}
+  .char-disp{color:#74c0fc}
+  .clabel{color:#adb5bd}
+  #si{color:#adb5bd}
+  .cnavbtn{background:#1a1f26;color:#ced4da;border-color:#343a40}
+  .cur-char-label{color:#74c0fc}
+}
 </style></head><body>
 <div class="rules">
   <h3>✏️ 한글 쓰기 3원칙</h3>

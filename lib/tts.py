@@ -1,5 +1,12 @@
-"""Koreanische TTS — edge-tts (Microsoft Neural, kostenlos)"""
-import asyncio, base64, os, tempfile
+"""Koreanische TTS — edge-tts (Microsoft Neural, kostenlos).
+
+Zwei-Stufen-Cache:
+  1. Memory (Streamlit session_state) — sofortiger Treffer in derselben Session
+  2. Disk (~/.cache/ko_lernen_tts) — überlebt App-Restart
+"""
+import asyncio, base64, hashlib, os
+from collections import OrderedDict
+from pathlib import Path
 import edge_tts
 
 VOICES = {
@@ -12,24 +19,36 @@ SPEED_PRESETS = {
     "▶ Normal":          0,
     "⚡ Schnell":      +15,
 }
-DEFAULT_VOICE  = "ko-KR-SunHiNeural"
-DEFAULT_RATE   = "-15%"
-SAMPLE_TEXT    = "안녕하세요! 저는 한국어를 공부해요."
+DEFAULT_VOICE = "ko-KR-SunHiNeural"
+DEFAULT_RATE  = "-15%"
+SAMPLE_TEXT   = "안녕하세요! 저는 한국어를 공부해요."
 
-async def _synth(text, voice, rate):
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
-    tmp.close()
-    try:
-        await edge_tts.Communicate(text, voice, rate=rate).save(tmp.name)
-        return open(tmp.name, "rb").read()
-    finally:
-        try: os.unlink(tmp.name)
-        except OSError: pass
+_MEM_CACHE_MAX = 200
+CACHE_DIR = Path.home() / ".cache" / "ko_lernen_tts"
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-def synthesize(text, voice=DEFAULT_VOICE, rate=DEFAULT_RATE):
-    return asyncio.run(_synth(text, voice, rate))
 
-def audio_html(audio_bytes, compact=False):
+def _cache_path(text: str, voice: str, rate: str) -> Path:
+    key = hashlib.md5(f"{text}|{voice}|{rate}".encode("utf-8")).hexdigest()
+    return CACHE_DIR / f"{key}.mp3"
+
+
+async def _synth_to_disk(text: str, voice: str, rate: str, path: Path) -> bytes:
+    await edge_tts.Communicate(text, voice, rate=rate).save(str(path))
+    return path.read_bytes()
+
+
+def synthesize(text: str, voice: str = DEFAULT_VOICE, rate: str = DEFAULT_RATE) -> bytes:
+    path = _cache_path(text, voice, rate)
+    if path.exists():
+        try:
+            return path.read_bytes()
+        except OSError:
+            pass
+    return asyncio.run(_synth_to_disk(text, voice, rate, path))
+
+
+def audio_html(audio_bytes: bytes, compact: bool = False) -> str:
     b64 = base64.b64encode(audio_bytes).decode()
     uid = abs(hash(audio_bytes[:32])) % 1_000_000
     h   = "36px" if compact else "54px"
@@ -39,10 +58,19 @@ def audio_html(audio_bytes, compact=False):
         f'<source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
     )
 
-def get_cached_audio(text, voice, rate):
+
+def get_cached_audio(text: str, voice: str, rate: str) -> bytes:
+    """Memory-Cache (session_state) vor Disk-Cache vor Synthese."""
     import streamlit as st
-    st.session_state.setdefault("tts_cache", {})
-    key = (text[:80], voice, rate)
-    if key not in st.session_state.tts_cache:
-        st.session_state.tts_cache[key] = synthesize(text, voice, rate)
-    return st.session_state.tts_cache[key]
+    cache: "OrderedDict[tuple, bytes]" = st.session_state.setdefault("tts_cache", OrderedDict())
+    key = (text[:120], voice, rate)
+    hit = cache.get(key)
+    if hit is not None:
+        cache.move_to_end(key)
+        return hit
+    audio = synthesize(text, voice, rate)
+    cache[key] = audio
+    cache.move_to_end(key)
+    while len(cache) > _MEM_CACHE_MAX:
+        cache.popitem(last=False)
+    return audio

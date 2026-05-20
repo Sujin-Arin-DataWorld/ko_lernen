@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# App
+.cache/
+.streamlit/secrets.toml
+
+# Local-only learning material (large PDFs / Anki decks)
+data/Telc_C1/
