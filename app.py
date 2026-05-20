@@ -99,20 +99,44 @@ html, body, [class*="css"] {
 }
 .section-h .sh-aside { font-size: .72rem; color: #adb5bd; font-weight: 500; }
 
-/* ── Level pip row (Streamlit buttons styled) ────────────────────────── */
-div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > button {
-    width: 100% !important; min-width: 0 !important;
-    aspect-ratio: 1 !important; height: auto !important;
-    padding: 0 !important;
-    border-radius: 50% !important; border: 2px solid transparent !important;
-    background: #f1f3f5 !important; color: #adb5bd !important;
-    font-size: .8rem !important; font-weight: 700 !important;
+/* ── Level pip grid (8 columns, single row, HTML links) ───────────────── */
+.lvl-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+    margin: .5rem 0 .8rem;
 }
-.lvlmark { display: none; }
-.lvl-cap {
-    text-align: center; font-size: .68rem; font-weight: 700;
-    margin: 4px 0 0; letter-spacing: -.02em;
+.lvl-pip {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 5px;
+    text-decoration: none !important;
+    color: inherit !important;
+    transition: transform .12s ease;
+    -webkit-tap-highlight-color: transparent;
 }
+.lvl-pip:active { transform: scale(.9); }
+.lvl-pip-mark {
+    width: 100%; aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: .82rem;
+    background: #f1f3f5; color: #adb5bd;
+    border: 2px solid transparent;
+    line-height: 1;
+}
+.lvl-pip.done    .lvl-pip-mark { background: #d3f9d8; color: #2b8a3e; }
+.lvl-pip.current .lvl-pip-mark {
+    background: #e5dbff; color: #5f3dc4; border-color: #845ef7;
+    box-shadow: 0 4px 12px rgba(132,94,247,.3);
+}
+.lvl-pip-lbl {
+    font-size: .62rem; font-weight: 700;
+    color: #adb5bd; letter-spacing: -.03em;
+    text-align: center; line-height: 1;
+    white-space: nowrap;
+}
+.lvl-pip.done    .lvl-pip-lbl { color: #2b8a3e; }
+.lvl-pip.current .lvl-pip-lbl { color: #5f3dc4; }
 
 /* ── Module cards ────────────────────────────────────────────────────── */
 .modules { display: grid; gap: .65rem; }
@@ -167,6 +191,9 @@ div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > bu
     .mod-card { padding: .85rem 1rem; }
     .mod-card .mod-title { font-size: .92rem; }
     .mod-card .mod-desc { font-size: .76rem; }
+    .lvl-grid { gap: 4px; }
+    .lvl-pip-mark { font-size: .72rem; }
+    .lvl-pip-lbl { font-size: .56rem; }
 }
 
 /* ── Dark mode ───────────────────────────────────────────────────────── */
@@ -180,9 +207,12 @@ div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > bu
     .chip.success { background: #1b3a23; color: #8ce99a; }
     .chip.warning { background: #3a3017; color: #ffd43b; }
     .chip.accent  { background: #3b2c66; color: #d0bfff; }
-    div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > button {
-        background: #2a2f36 !important; color: #6c757d !important;
-    }
+    .lvl-pip-mark { background: #2a2f36; color: #6c757d; }
+    .lvl-pip.done    .lvl-pip-mark { background: #1b3a23; color: #8ce99a; }
+    .lvl-pip.current .lvl-pip-mark { background: #3b2c66; color: #d0bfff; border-color: #845ef7; }
+    .lvl-pip-lbl { color: #6c757d; }
+    .lvl-pip.done    .lvl-pip-lbl { color: #8ce99a; }
+    .lvl-pip.current .lvl-pip-lbl { color: #d0bfff; }
     .mod-hangul  { background: linear-gradient(135deg,#2a1525,#3a1a2c); color: #fcc2d7; border-color: #d6336c; }
     .mod-vocab   { background: linear-gradient(135deg,#0f2942,#162e4d); color: #a5d8ff; border-color: #339af0; }
     .mod-grammar { background: linear-gradient(135deg,#3a2e0e,#2e2616); color: #ffe066; border-color: #f59f00; }
@@ -238,29 +268,47 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ── Level Progress ────────────────────────────────────────────────────────────
+# URL-Klick auf Level-Pip auswerten (?set_lvl=N)
+_set_lvl = st.query_params.get("set_lvl")
+if _set_lvl is not None:
+    try:
+        _new = int(_set_lvl)
+        if 0 <= _new < len(LEVELS):
+            st.session_state.current_level_idx = _new
+    except (ValueError, TypeError):
+        pass
+    if "set_lvl" in st.query_params:
+        del st.query_params["set_lvl"]
+    st.rerun()
+
+current = st.session_state.current_level_idx  # nach evt. Update
+
 st.markdown(
     '<div class="section-h">📈 Dein Level <span class="sh-aside">Tippen zum Setzen</span></div>',
     unsafe_allow_html=True,
 )
 
-def _render_pip_row(indices):
-    st.markdown('<div class="lvlmark"></div>', unsafe_allow_html=True)
-    cols = st.columns(len(indices))
-    for col, i in zip(cols, indices):
-        lvl = LEVELS[i]
-        if i < current:
-            label, color = "✓", "#51cf66"
-        elif i == current:
-            label, color = "📍", "#845ef7"
-        else:
-            label, color = "·", "#adb5bd"
-        if col.button(label, key=f"lvl_{i}", help=f"Auf {lvl} setzen"):
-            st.session_state.current_level_idx = i
-            st.rerun()
-        col.markdown(f'<div class="lvl-cap" style="color:{color}">{lvl}</div>', unsafe_allow_html=True)
+# Pip-Grid (HTML <a>-Links, kein Streamlit-Button) — keine :has-Abhängigkeit
+from urllib.parse import urlencode
+_keep_q = {k: v for k in ("name", "os") if (v := st.query_params.get(k))}
 
-_render_pip_row(range(4))
-_render_pip_row(range(4, 8))
+def _pip_href(i: int) -> str:
+    return "?" + urlencode({**_keep_q, "set_lvl": i})
+
+_pips = []
+for i, lvl in enumerate(LEVELS):
+    if i < current:
+        cls, mark = "done", "✓"
+    elif i == current:
+        cls, mark = "current", "📍"
+    else:
+        cls, mark = "todo", "·"
+    _pips.append(
+        f'<a class="lvl-pip {cls}" href="{_pip_href(i)}" target="_self" title="Auf {lvl} setzen">'
+        f'<span class="lvl-pip-mark">{mark}</span>'
+        f'<span class="lvl-pip-lbl">{lvl}</span></a>'
+    )
+st.markdown(f'<div class="lvl-grid">{"".join(_pips)}</div>', unsafe_allow_html=True)
 st.progress((current + 0.5) / len(LEVELS))
 
 # ── Modules ───────────────────────────────────────────────────────────────────
