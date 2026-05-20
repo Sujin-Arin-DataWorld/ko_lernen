@@ -58,25 +58,12 @@ st.markdown("""
 .level-meta { color: #5f3dc4; font-size: .88rem; line-height: 1.5; }
 .level-meta strong { font-size: .95rem; display: block; margin-bottom: .1rem; }
 
-/* ── 레벨 핍 버튼 (expander 안) ── */
-div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > button {
-    width:44px !important; height:44px !important; border-radius:50% !important;
-    padding:0 !important; font-size:.85rem !important; font-weight:700 !important;
-    margin:0 auto !important; display:block !important;
-}
-.lvlmark { display:none; }
-.lvl-cap { text-align:center; font-size:.78rem; font-weight:700; margin-top:4px; }
-
 /* ── 모바일 ── */
 @media (max-width: 640px) {
     .home-card h2 { font-size: 1.05rem; }
     .home-card p  { font-size: .85rem; }
     .level-summary { padding: .7rem .9rem; gap: .6rem; }
     .level-badge { font-size: .95rem; }
-    div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > button {
-        width:40px !important; height:40px !important; font-size:.75rem !important;
-    }
-    .lvl-cap { font-size:.68rem; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -105,25 +92,17 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 st.progress((current + 0.5) / len(LEVELS))
 
-def _render_pip_row(indices):
-    st.markdown('<div class="lvlmark"></div>', unsafe_allow_html=True)
-    cols = st.columns(len(indices))
-    for col, i in zip(cols, indices):
-        lvl = LEVELS[i]
-        if i < current:
-            label, color = "✓", "#51cf66"
-        elif i == current:
-            label, color = "📍", "#845ef7"
-        else:
-            label, color = "·", "#adb5bd"
-        if col.button(label, key=f"lvl_{i}", help=f"Auf {lvl} setzen"):
-            st.session_state.current_level_idx = i
-            st.rerun()
-        col.markdown(f'<div class="lvl-cap" style="color:{color}">{lvl}</div>', unsafe_allow_html=True)
-
 with st.expander("✏️ Level ändern"):
-    _render_pip_row(range(4))
-    _render_pip_row(range(4, 8))
+    selected = st.select_slider(
+        "Level wählen",
+        options=LEVELS,
+        value=LEVELS[current],
+        label_visibility="collapsed",
+    )
+    new_idx = LEVELS.index(selected)
+    if new_idx != current:
+        st.session_state.current_level_idx = new_idx
+        st.rerun()
 
 # ── Heutige Statistik ─────────────────────────────────────────────────────────
 st.markdown("---")
