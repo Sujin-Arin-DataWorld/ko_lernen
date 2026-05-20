@@ -20,6 +20,7 @@ _DEF = {
     "vok_idx":         0,
     "vok_flipped":     False,
     "vok_correct":     0,
+    "vok_wrong":       0,
     "vok_skipped":     0,
     "vok_seen_ids":    [],
     "tts_voice_label": "Sun-Hi — Weiblich (Seoul)",
@@ -68,6 +69,7 @@ html, body, [class*="css"] {
 .chip.primary { background: #e7f5ff; color: #1864ab; }
 .chip.success { background: #ebfbee; color: #2b8a3e; }
 .chip.warning { background: #fff9db; color: #7d4a00; }
+.chip.danger  { background: #ffe3e3; color: #c92a2a; }
 
 /* ── Progress ─────────────────────────────────────────── */
 .prog-bar  { height: 5px; border-radius: 3px; background: #dee2e6; margin: .35rem 0 .8rem; overflow: hidden; }
@@ -92,17 +94,17 @@ html, body, [class*="css"] {
 [data-testid="stVerticalBlock"]:has(.fc-front) [data-testid="stForm"] button,
 [data-testid="stVerticalBlock"]:has(.fc-back)  [data-testid="stForm"] button {
     pointer-events: auto !important; width: 100% !important;
-    height: 220px !important; cursor: pointer !important;
+    height: 190px !important; cursor: pointer !important;
     background: transparent !important;
 }
 
 .fc-front, .fc-back {
-    border-radius: 18px; padding: 1.4rem 1.2rem;
-    height: 220px;
+    border-radius: 16px; padding: 1rem .9rem;
+    height: 190px;
     display: flex; flex-direction: column; align-items: center;
     justify-content: center; text-align: center; user-select: none;
     box-sizing: border-box;
-    box-shadow: 0 4px 16px rgba(51, 154, 240, .12);
+    box-shadow: 0 4px 14px rgba(51, 154, 240, .10);
     transition: transform .2s ease;
 }
 .fc-front {
@@ -115,28 +117,28 @@ html, body, [class*="css"] {
     box-shadow: 0 4px 16px rgba(81, 207, 102, .15);
 }
 .fc-level {
-    font-size: .68rem; font-weight: 800; color: #fff;
+    font-size: .62rem; font-weight: 800; color: #fff;
     background: rgba(255,255,255,.25); border-radius: 100px;
-    padding: 3px 10px; margin-bottom: .5rem;
+    padding: 2px 8px; margin-bottom: .35rem;
     letter-spacing: .04em;
 }
 .fc-front .fc-level { background: #339af0; }
 .fc-back  .fc-level { background: #51cf66; }
-.fc-korean   { font-size: 2.4rem; font-weight: 800; color: #1864ab; margin: 0 0 .25rem; line-height: 1.15; }
-.fc-roman    { font-size: 1rem; color: #4c9fd6; margin-bottom: .4rem; font-style: italic; }
-.fc-german   { font-size: 1.6rem; font-weight: 800; color: #2b8a3e; margin: 0 0 .25rem; line-height: 1.2; }
-.fc-pos      { font-size: .78rem; color: #868e96; margin-bottom: .15rem; }
-.fc-example  { font-size: .85rem; color: #495057; margin-top: .5rem; line-height: 1.5; }
+.fc-korean   { font-size: 2rem;   font-weight: 800; color: #1864ab; margin: 0 0 .2rem; line-height: 1.15; }
+.fc-roman    { font-size: .9rem;  color: #4c9fd6; margin-bottom: .3rem; font-style: italic; }
+.fc-german   { font-size: 1.35rem; font-weight: 800; color: #2b8a3e; margin: 0 0 .2rem; line-height: 1.2; }
+.fc-pos      { font-size: .72rem; color: #868e96; margin-bottom: .1rem; }
+.fc-example  { font-size: .8rem;  color: #495057; margin-top: .35rem; line-height: 1.45; }
 .fc-example em { font-weight: 600; font-style: normal; color: #1864ab; }
 .fc-back .fc-example em { color: #2b8a3e; }
-.fc-hint     { font-size: .75rem; color: #868e96; margin-top: .5rem; opacity: .7; }
+.fc-hint     { font-size: .7rem;  color: #868e96; margin-top: .35rem; opacity: .7; }
 
 /* ── Nav arrows ───────────────────────────────────────── */
 [data-testid="stHorizontalBlock"]:has(.fc-front) [data-testid="stColumn"]:first-child button,
 [data-testid="stHorizontalBlock"]:has(.fc-back)  [data-testid="stColumn"]:first-child button,
 [data-testid="stHorizontalBlock"]:has(.fc-front) [data-testid="stColumn"]:last-child button,
 [data-testid="stHorizontalBlock"]:has(.fc-back)  [data-testid="stColumn"]:last-child button {
-    font-size: 1.6rem !important; height: 220px !important;
+    font-size: 1.5rem !important; height: 190px !important;
     background: transparent !important; border: none !important;
     color: #adb5bd !important; transition: color .15s, transform .12s;
 }
@@ -161,17 +163,22 @@ html, body, [class*="css"] {
 
 /* ── Smaller screens ──────────────────────────────────── */
 @media (max-width: 480px) {
-    .block-container { padding-left: .65rem !important; padding-right: .65rem !important; }
-    .fc-front, .fc-back { padding: 1.2rem .9rem; height: 200px; }
+    .block-container { padding-left: .55rem !important; padding-right: .55rem !important; padding-top: .5rem !important; }
+    .page-title { font-size: 1.15rem; }
+    .page-sub   { font-size: .72rem; margin-bottom: .5rem; }
+    .fc-front, .fc-back { padding: .85rem .7rem; height: 170px; border-radius: 14px; }
     [data-testid="stVerticalBlock"]:has(.fc-front) [data-testid="stForm"] button,
-    [data-testid="stVerticalBlock"]:has(.fc-back)  [data-testid="stForm"] button { height: 200px !important; }
+    [data-testid="stVerticalBlock"]:has(.fc-back)  [data-testid="stForm"] button { height: 170px !important; }
     [data-testid="stHorizontalBlock"]:has(.fc-front) [data-testid="stColumn"]:first-child button,
     [data-testid="stHorizontalBlock"]:has(.fc-back)  [data-testid="stColumn"]:first-child button,
     [data-testid="stHorizontalBlock"]:has(.fc-front) [data-testid="stColumn"]:last-child button,
-    [data-testid="stHorizontalBlock"]:has(.fc-back)  [data-testid="stColumn"]:last-child button { height: 200px !important; }
-    .fc-korean { font-size: 2rem; }
-    .fc-german { font-size: 1.4rem; }
-    .fc-example { font-size: .82rem; }
+    [data-testid="stHorizontalBlock"]:has(.fc-back)  [data-testid="stColumn"]:last-child button { height: 170px !important; font-size: 1.3rem !important; }
+    .fc-korean  { font-size: 1.7rem; }
+    .fc-german  { font-size: 1.2rem; }
+    .fc-example { font-size: .76rem; line-height: 1.4; }
+    .fc-roman   { font-size: .82rem; }
+    .fc-pos     { font-size: .68rem; }
+    .fc-hint    { font-size: .65rem; }
 }
 
 /* ── Dark mode ────────────────────────────────────────── */
@@ -183,6 +190,7 @@ html, body, [class*="css"] {
     .chip.primary { background: #1d3557; color: #74c0fc; }
     .chip.success { background: #1b3a23; color: #8ce99a; }
     .chip.warning { background: #3a3017; color: #ffd43b; }
+    .chip.danger  { background: #3a1f1f; color: #ff8787; }
     .prog-bar { background: #2a2f36; }
     .fc-front {
         background: linear-gradient(135deg, #0f2942, #162e4d);
@@ -240,11 +248,12 @@ with st.sidebar:
 
     st.divider()
     if st.button("🔄 Session zurücksetzen", use_container_width=True):
-        st.session_state.vok_correct = 0
-        st.session_state.vok_skipped = 0
+        st.session_state.vok_correct  = 0
+        st.session_state.vok_wrong    = 0
+        st.session_state.vok_skipped  = 0
         st.session_state.vok_seen_ids = []
-        st.session_state.vok_idx = 0
-        st.session_state.vok_flipped = False
+        st.session_state.vok_idx      = 0
+        st.session_state.vok_flipped  = False
         st.rerun()
 
 # ── Filter anwenden ───────────────────────────────────────────────────────────
@@ -271,9 +280,9 @@ pct  = seen / max(1, len(df_all)) * 100
 
 st.markdown(f"""
 <div class="chips">
-    <span class="chip primary">📚 {idx+1} / {len(df)}</span>
-    <span class="chip">📊 {seen} entdeckt</span>
+    <span class="chip primary">📚 {idx+1}/{len(df)}</span>
     <span class="chip success">✅ {st.session_state.vok_correct}</span>
+    <span class="chip danger">❌ {st.session_state.vok_wrong}</span>
     <span class="chip warning">⏭ {st.session_state.vok_skipped}</span>
 </div>
 <div class="prog-bar"><div class="prog-fill" style="width:{pct:.0f}%"></div></div>
@@ -345,46 +354,54 @@ with _next_col:
         st.session_state.vok_flipped = False
         st.rerun()
 
-# ── TTS + Antwort-Buttons ────────────────────────────────────────────────────
-if st.button("🔊 Aussprache hören", use_container_width=True, key="tts_btn"):
-    with st.spinner("Lade Audio…"):
-        audio = get_cached_audio(row.korean, voice, speed)
-        st.markdown(audio_html(audio), unsafe_allow_html=True)
-
+# ── Aktions-Zeile ────────────────────────────────────────────────────────────
 if flipped:
-    ac1, ac2 = st.columns(2)
-    with ac1:
+    # Antwort-Buttons: Gewusst / Nicht gewusst (Hauptaktion, 2 Spalten breit)
+    a1, a2 = st.columns(2)
+    with a1:
         if st.button("✅ Gewusst!", use_container_width=True, key="correct_btn", type="primary"):
             st.session_state.vok_correct += 1
             st.session_state.correct_answers = st.session_state.get("correct_answers", 0) + 1
             st.session_state.vok_idx = (idx + 1) % len(df)
             st.session_state.vok_flipped = False
             st.rerun()
-    with ac2:
-        if st.button("⏭ Überspringen", use_container_width=True, key="skip_btn"):
+    with a2:
+        if st.button("❌ Nicht gewusst", use_container_width=True, key="wrong_btn"):
+            st.session_state.vok_wrong += 1
+            st.session_state.vok_idx = (idx + 1) % len(df)
+            st.session_state.vok_flipped = False
+            st.rerun()
+    # Unten: TTS + Skip + Zufall (kleiner)
+    b1, b2, b3 = st.columns([2, 5, 5])
+    with b1:
+        if st.button("🔊", use_container_width=True, key="tts_btn", help="Aussprache"):
+            with st.spinner(""):
+                audio = get_cached_audio(row.korean, voice, speed)
+                st.markdown(audio_html(audio, compact=True), unsafe_allow_html=True)
+    with b2:
+        if st.button("⏭ Skip", use_container_width=True, key="skip_btn"):
             st.session_state.vok_skipped += 1
             st.session_state.vok_idx = (idx + 1) % len(df)
             st.session_state.vok_flipped = False
             st.rerun()
-
-# ── Bottom-Navigation ────────────────────────────────────────────────────────
-st.markdown("")
-b1, b2, b3 = st.columns(3)
-with b1:
-    if st.button("⏮ Erste", use_container_width=True):
-        st.session_state.vok_idx = 0
-        st.session_state.vok_flipped = False
-        st.rerun()
-with b2:
-    if st.button("🔀 Zufällig", use_container_width=True):
-        st.session_state.vok_idx = random.randint(0, len(df) - 1)
-        st.session_state.vok_flipped = False
-        st.rerun()
-with b3:
-    if st.button("⏭ Letzte", use_container_width=True):
-        st.session_state.vok_idx = len(df) - 1
-        st.session_state.vok_flipped = False
-        st.rerun()
+    with b3:
+        if st.button("🔀 Zufällig", use_container_width=True, key="rand_btn"):
+            st.session_state.vok_idx = random.randint(0, len(df) - 1)
+            st.session_state.vok_flipped = False
+            st.rerun()
+else:
+    # Vor dem Flip: nur TTS + Zufall
+    t1, t2 = st.columns([2, 5])
+    with t1:
+        if st.button("🔊", use_container_width=True, key="tts_btn", help="Aussprache"):
+            with st.spinner(""):
+                audio = get_cached_audio(row.korean, voice, speed)
+                st.markdown(audio_html(audio, compact=True), unsafe_allow_html=True)
+    with t2:
+        if st.button("🔀 Zufällig", use_container_width=True, key="rand_btn"):
+            st.session_state.vok_idx = random.randint(0, len(df) - 1)
+            st.session_state.vok_flipped = False
+            st.rerun()
 
 # ── Swipe-Gesten ──────────────────────────────────────────────────────────────
 components.html("""

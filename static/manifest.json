@@ -1,0 +1,21 @@
+{
+  "name": "Koreanisch lernen — 한국어",
+  "short_name": "한국어",
+  "description": "Persönlicher Koreanisch-Trainer für A1 bis B2 — Hangul, Vokabeln, Grammatik, Hören",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f1419",
+  "theme_color": "#845ef7",
+  "lang": "ko-KR",
+  "categories": ["education", "books"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

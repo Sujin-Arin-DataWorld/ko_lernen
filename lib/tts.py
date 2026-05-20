@@ -62,15 +62,33 @@ def audio_html(audio_bytes: bytes, compact: bool = False) -> str:
 def get_cached_audio(text: str, voice: str, rate: str) -> bytes:
     """Memory-Cache (session_state) vor Disk-Cache vor Synthese."""
     import streamlit as st
-    cache: "OrderedDict[tuple, bytes]" = st.session_state.setdefault("tts_cache", OrderedDict())
+    raw = st.session_state.get("tts_cache")
+    # Legacy dicts (z.B. aus app.py _DEFAULTS) auf OrderedDict heben,
+    # ohne bisherige Einträge zu verlieren.
+    if not isinstance(raw, OrderedDict):
+        seed = dict(raw) if isinstance(raw, dict) else {}
+        raw = OrderedDict(seed)
+        st.session_state["tts_cache"] = raw
+    cache: "OrderedDict[tuple, bytes]" = raw
+
     key = (text[:120], voice, rate)
     hit = cache.get(key)
     if hit is not None:
-        cache.move_to_end(key)
+        try:
+            cache.move_to_end(key)
+        except (AttributeError, KeyError):
+            pass
         return hit
+
     audio = synthesize(text, voice, rate)
     cache[key] = audio
-    cache.move_to_end(key)
+    try:
+        cache.move_to_end(key)
+    except AttributeError:
+        pass
     while len(cache) > _MEM_CACHE_MAX:
-        cache.popitem(last=False)
+        try:
+            cache.popitem(last=False)
+        except (TypeError, AttributeError):
+            cache.popitem()
     return audio

@@ -1,5 +1,7 @@
 """🇰🇷 Koreanisch lernen — Persönlicher Trainer"""
+from collections import OrderedDict
 import streamlit as st
+import streamlit.components.v1 as components
 
 st.set_page_config(
     page_title="🇰🇷 Koreanisch lernen",
@@ -8,11 +10,36 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# ── PWA: manifest + theme color in <head> injizieren ──────────────────────────
+components.html("""
+<script>
+(function(){
+    if (window.parent._pwaInit) return;
+    window.parent._pwaInit = true;
+    try {
+        var doc = window.parent.document;
+        var add = function(tag, attrs){
+            for (var k in attrs) { var existing = doc.querySelector(tag + '[' + k + '="' + attrs[k] + '"]'); if (existing) return; }
+            var el = doc.createElement(tag);
+            for (var k in attrs) el.setAttribute(k, attrs[k]);
+            doc.head.appendChild(el);
+        };
+        add('link', {rel:'manifest',          href:'/app/static/manifest.json'});
+        add('meta', {name:'theme-color',      content:'#845ef7'});
+        add('meta', {name:'apple-mobile-web-app-capable',         content:'yes'});
+        add('meta', {name:'apple-mobile-web-app-status-bar-style', content:'black-translucent'});
+        add('meta', {name:'apple-mobile-web-app-title',           content:'한국어'});
+        add('link', {rel:'apple-touch-icon',  href:'/app/static/icon.svg'});
+    } catch(e) { console.warn('pwa init', e); }
+})();
+</script>
+""", height=0)
+
 _DEFAULTS = {
     "total_cards_seen":  0,
     "cards_flipped":     0,
     "correct_answers":   0,
-    "tts_cache":         {},
+    "tts_cache":         OrderedDict(),   # OrderedDict ist Pflicht (move_to_end)
     "tts_voice_label":   "Sun-Hi — Weiblich (Seoul)",
     "tts_speed_label":   "📖 Lerntempo",
     "current_level_idx": 0,
