@@ -331,7 +331,7 @@ canvas{border:2px solid #dee2e6;border-radius:12px;display:block;max-width:100%;
   <div class="cs">
     <div class="clabel">✍️ 연습 (Üben) — mit dem Finger!</div>
     <div class="char-disp" style="color:#2b8a3e">Schreibe nach!</div>
-    <canvas id="pc" width="220" height="220"></canvas>
+    <div class="canvas-wrap"><canvas id="pc" width="220" height="220"></canvas><div id="praise">Toll! 👏</div></div>
     <button class="clrbtn" onclick="clearP()">🗑 Löschen</button>
     <div class="cnav">
       <button class="cnavbtn" onclick="navChar(-1)">◀ 이전</button>
@@ -345,13 +345,15 @@ canvas{border:2px solid #dee2e6;border-radius:12px;display:block;max-width:100%;
 .cnavbtn{padding:5px 14px;border-radius:10px;border:2px solid #dee2e6;background:#fff;cursor:pointer;font-size:.88rem;font-weight:600}
 .cnavbtn:hover{background:#f1f3f5;border-color:#adb5bd}
 .cur-char-label{font-size:1rem;font-weight:700;color:#1864ab;text-align:center;flex:1}
-#praise{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  background:rgba(43,138,62,0.93);color:#fff;border-radius:20px;
-  padding:18px 36px;font-size:1.9rem;font-weight:700;
-  pointer-events:none;opacity:0;transition:opacity .4s;z-index:999;
-  text-align:center;white-space:nowrap}
+.canvas-wrap{position:relative;display:inline-block;line-height:0}
+#praise{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);
+  background:rgba(43,138,62,0.95);color:#fff;border-radius:18px;
+  padding:14px 26px;font-size:1.5rem;font-weight:700;
+  pointer-events:none;opacity:0;transition:opacity .35s, transform .35s;
+  z-index:999;text-align:center;white-space:nowrap;line-height:1.2;
+  box-shadow:0 6px 20px rgba(43,138,62,0.4)}
+#praise.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 </style>
-<div id="praise">잘했어! 👏</div>
 <script>
 const S={
  'ㄱ':[{t:'l',p:[[30,55],[172,55],[172,178]]}],
@@ -395,11 +397,13 @@ let cur='ㄱ',curS=0,animT=null,curList=CON,drawDist=0;
 const dc=document.getElementById('dc'),dctx=dc.getContext('2d');
 const pc=document.getElementById('pc'),pctx=pc.getContext('2d');
 const praiseEl=document.getElementById('praise');
+const PRAISES=['Gut gemacht! 👏','Toll! ⭐','Super! 🎉','Bravo! 💪','Klasse! ✨','Spitze! 🌟','Wunderbar! 🎯'];
 let praiseT=null;
 function showPraise(){
-  praiseEl.style.opacity='1';
+  praiseEl.textContent=PRAISES[Math.floor(Math.random()*PRAISES.length)];
+  praiseEl.classList.add('show');
   if(praiseT)clearTimeout(praiseT);
-  praiseT=setTimeout(()=>{praiseEl.style.opacity='0';},1800);
+  praiseT=setTimeout(()=>{praiseEl.classList.remove('show');},1600);
 }
 function setMode(m,btn){
   document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
@@ -488,7 +492,7 @@ function drawGuide(){
 function clearP(){drawGuide();}
 // Drawing
 let drw=false,lx=0,ly=0;
-const PRAISE_DIST=280;
+const PRAISE_DIST=180;
 function pos(e,cvs){
   const r=cvs.getBoundingClientRect(),sx=cvs.width/r.width,sy=cvs.height/r.height;
   if(e.touches)return{x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
