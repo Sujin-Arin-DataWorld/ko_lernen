@@ -146,6 +146,13 @@ def require_user() -> dict:
     os_kind = get_os()
 
     if name:
+        # Erstes Durchlaufen nach Submit: localStorage schreiben + URL syncen.
+        # Flag verhindert mehrfache iframe-Mounts auf jedem Rerun.
+        if not st.session_state.get("_user_persisted"):
+            _persist_to_local_storage(name, os_kind)
+            if qp_name != name:
+                st.query_params["name"] = name
+            st.session_state._user_persisted = True
         return {"name": name, "os": os_kind, "is_known": True}
 
     # ── Onboarding UI ────────────────────────────────────────────────────────
@@ -160,6 +167,9 @@ def require_user() -> dict:
     </div>
     """, unsafe_allow_html=True)
 
+    # WICHTIG: Submit-Handler MUSS außerhalb des Form-Blocks laufen,
+    # damit st.rerun() nicht mit dem auto-rerun des Form-Submits kollidiert
+    # und session_state vor dem rerun garantiert geschrieben ist.
     with st.form("user_name_form", clear_on_submit=False):
         name_in = st.text_input(
             "Dein Vorname",
@@ -168,13 +178,22 @@ def require_user() -> dict:
             max_chars=30,
             key="onb_name_in",
         )
-        if st.form_submit_button("✨ Loslegen! · 시작하기", use_container_width=True, type="primary"):
-            clean = name_in.strip()[:30]
-            if clean:
-                st.session_state.user_name = clean
-                st.query_params["name"] = clean
-                _persist_to_local_storage(clean, os_kind)
-                st.rerun()
+        submitted = st.form_submit_button(
+            "✨ Loslegen! · 시작하기",
+            use_container_width=True,
+            type="primary",
+        )
+
+    if submitted:
+        clean = (name_in or "").strip()[:30]
+        if clean:
+            st.session_state.user_name = clean
+            # _user_persisted bewusst auf False — der nächste Rerun
+            # erledigt localStorage-Save + URL-Sync im `if name:`-Zweig.
+            st.session_state._user_persisted = False
+            st.rerun()
+        else:
+            st.warning("Bitte gib einen Namen ein. · 이름을 입력해 주세요.")
 
     st.markdown(
         '<p class="onb-hint">💡 Dein Name wird nur lokal auf deinem Gerät gespeichert.<br>'
@@ -187,7 +206,7 @@ def require_user() -> dict:
 
 def clear_user() -> None:
     """Forget current user (sidebar reset etc.)."""
-    for k in ("user_name", "_user_boot", "onb_name_in"):
+    for k in ("user_name", "_user_boot", "_user_persisted", "onb_name_in"):
         st.session_state.pop(k, None)
     try:
         del st.query_params["name"]
