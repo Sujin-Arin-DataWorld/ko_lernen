@@ -42,18 +42,21 @@ st.markdown("""
 
 /* ── 레벨 뱃지 카드 ── */
 .level-summary {
-    display: flex; align-items: center; gap: .8rem;
+    display: flex; align-items: center; gap: 1rem;
     background: linear-gradient(135deg,#f3f0ff,#e5dbff);
     border: 1.5px solid #845ef7; border-radius: 14px;
-    padding: .85rem 1.1rem; margin-bottom: .5rem;
+    padding: .9rem 1.2rem; margin-bottom: .5rem;
 }
 .level-badge {
     background: #845ef7; color: #fff;
-    border-radius: 8px; padding: .3rem .7rem;
-    font-size: 1.05rem; font-weight: 800; white-space: nowrap;
+    border-radius: 10px; padding: .45rem .9rem;
+    font-size: 1.4rem; font-weight: 900;
+    letter-spacing: .03em; line-height: 1; white-space: nowrap;
+    display: flex; align-items: center; justify-content: center;
+    min-width: 4rem; text-align: center;
 }
-.level-meta { color: #5f3dc4; font-size: .88rem; line-height: 1.4; }
-.level-meta strong { font-size: 1rem; }
+.level-meta { color: #5f3dc4; font-size: .88rem; line-height: 1.5; }
+.level-meta strong { font-size: .95rem; display: block; margin-bottom: .1rem; }
 
 /* ── 레벨 핍 버튼 (expander 안) ── */
 div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > button {
@@ -93,7 +96,7 @@ current = st.session_state.current_level_idx
 pct = int((current + 1) / len(LEVELS) * 100)
 st.markdown(f"""
 <div class="level-summary">
-  <div class="level-badge">📍 {LEVELS[current]}</div>
+  <div class="level-badge">{LEVELS[current]}</div>
   <div class="level-meta">
     <strong>Dein Fortschritt</strong><br>
     Level {current + 1} von {len(LEVELS)} · {pct} % abgeschlossen
