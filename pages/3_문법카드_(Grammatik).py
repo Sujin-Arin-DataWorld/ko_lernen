@@ -7,7 +7,6 @@ import streamlit.components.v1 as components
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from lib.tts import VOICES, SPEED_PRESETS, get_cached_audio, audio_html
 from lib.data import load_grammar
-from lib.user import require_user
 
 st.set_page_config(
     page_title="📝 문법",
@@ -181,13 +180,10 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ── User gate ─────────────────────────────────────────────────────────────────
-user = require_user()
-
 # ── Header ────────────────────────────────────────────────────────────────────
 st.markdown('<a class="back-link" href="/" target="_self">← Zurück</a>', unsafe_allow_html=True)
 st.markdown('<h1 class="page-title">📝 문법 · Grammatik</h1>', unsafe_allow_html=True)
-st.markdown(f'<p class="page-sub">Hi {user["name"]} · Tippe für Erklärung + Beispiel</p>', unsafe_allow_html=True)
+st.markdown('<p class="page-sub">Tippe auf die Karte für Erklärung + Beispiel</p>', unsafe_allow_html=True)
 
 # ── Daten + Filter ────────────────────────────────────────────────────────────
 df_all = load_grammar()

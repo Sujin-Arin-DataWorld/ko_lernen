@@ -6,7 +6,6 @@ import streamlit as st
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from lib.tts import VOICES, SPEED_PRESETS, get_cached_audio, audio_html
 from lib.data import load_listening_sentences
-from lib.user import require_user
 
 st.set_page_config(
     page_title="🎧 듣기",
@@ -158,13 +157,10 @@ with st.sidebar:
         st.session_state.listen_show = False
         st.rerun()
 
-# ── User gate ─────────────────────────────────────────────────────────────────
-user = require_user()
-
 # ── Header ────────────────────────────────────────────────────────────────────
 st.markdown('<a class="back-link" href="/" target="_self">← Zurück</a>', unsafe_allow_html=True)
 st.markdown('<h1 class="page-title">🎧 듣기 · Hören</h1>', unsafe_allow_html=True)
-st.markdown(f'<p class="page-sub">Hi {user["name"]} · Hören · Verstehen · Selbst bewerten</p>', unsafe_allow_html=True)
+st.markdown('<p class="page-sub">Höre den Satz · Versuche zu verstehen · Bewerte dich selbst</p>', unsafe_allow_html=True)
 
 # ── Filter (main) ─────────────────────────────────────────────────────────────
 with st.expander("🔍 Filter", expanded=False):

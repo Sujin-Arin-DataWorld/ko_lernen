@@ -1,21 +1,12 @@
 """🇰🇷 Koreanisch lernen — Persönlicher Trainer"""
-import sys, pathlib
 import streamlit as st
 
-sys.path.insert(0, str(pathlib.Path(__file__).parent))
-
-# Page title personalisiert (Query-Param wird vor set_page_config gelesen)
-_qn = (st.query_params.get("name") or "").strip()[:30]
-_pt = f"🇰🇷 Koreanisch für {_qn}" if _qn else "🇰🇷 Koreanisch lernen"
-
 st.set_page_config(
-    page_title=_pt,
+    page_title="🇰🇷 Koreanisch lernen",
     page_icon="🇰🇷",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
-
-from lib.user import require_user, os_emoji, os_label, clear_user
 
 _DEFAULTS = {
     "total_cards_seen":  0,
@@ -222,16 +213,11 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ── User & OS ─────────────────────────────────────────────────────────────────
-user = require_user()           # blockt mit Onboarding falls noch kein Name
-_name = user["name"]
-_os   = user["os"]
-
 # ── Hero ──────────────────────────────────────────────────────────────────────
 st.markdown('<h1 class="hero-title">🇰🇷 한국어 — Koreanisch</h1>', unsafe_allow_html=True)
-st.markdown(f'<p class="hero-sub">안녕 {_name}! 오늘도 화이팅 💪</p>', unsafe_allow_html=True)
+st.markdown('<p class="hero-sub">안녕하세요! 오늘도 화이팅 💪</p>', unsafe_allow_html=True)
 st.markdown(
-    f'<p class="hero-meta">{os_emoji(_os)} {os_label(_os)} · Level <b>{LEVELS[current]}</b></p>',
+    f'<p class="hero-meta">Persönlicher Trainer · Level <b>{LEVELS[current]}</b></p>',
     unsafe_allow_html=True,
 )
 
@@ -347,18 +333,12 @@ with st.expander("💡 Lerntipp des Tages"):
     )
 
 # ── Reset ─────────────────────────────────────────────────────────────────────
-rc1, rc2 = st.columns(2)
-with rc1:
-    if st.button("🔄 Statistik zurücksetzen", use_container_width=True):
-        for k in ["total_cards_seen", "cards_flipped", "correct_answers"]:
-            st.session_state[k] = 0
-        st.rerun()
-with rc2:
-    if st.button(f"👤 Nicht {_name}?", use_container_width=True, help="Name zurücksetzen"):
-        clear_user()
-        st.rerun()
+if st.button("🔄 Statistik zurücksetzen", use_container_width=True):
+    for k in ["total_cards_seen", "cards_flipped", "correct_answers"]:
+        st.session_state[k] = 0
+    st.rerun()
 
 st.markdown(
-    f'<div class="footer">학습 화이팅! · Viel Erfolg, {_name} 🌟 · Made with ❤️ by Sujin</div>',
+    '<div class="footer">학습 화이팅! · Viel Erfolg 🌟 · Made with ❤️ by Sujin</div>',
     unsafe_allow_html=True,
 )

@@ -6,7 +6,6 @@ import streamlit.components.v1 as components
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from lib.tts import VOICES, SPEED_PRESETS, audio_html, get_cached_audio
-from lib.user import require_user
 
 st.set_page_config(page_title="🔤 Hangul", page_icon="🔤", layout="centered", initial_sidebar_state="collapsed")
 
@@ -269,13 +268,10 @@ with st.sidebar:
     - Lese-Reihenfolge: links → rechts, oben → unten
     """)
 
-# ── User gate ─────────────────────────────────────────────────────────────────
-user = require_user()
-
 # ── Hauptinhalt ───────────────────────────────────────────────────────────────
 st.markdown('<a class="back-link" href="/" target="_self">← Zurück</a>', unsafe_allow_html=True)
 st.markdown('<h1 class="page-title">🔤 한글 연습 · Hangul</h1>', unsafe_allow_html=True)
-st.markdown(f'<p class="page-sub">Hi {user["name"]} · 14 Konsonanten + 10 Vokale</p>', unsafe_allow_html=True)
+st.markdown('<p class="page-sub">14 Konsonanten + 10 Vokale = unbegrenzte Silben</p>', unsafe_allow_html=True)
 
 tab1, tab4, tab5 = st.tabs(["📊 Übersicht", "🃏 Karten", "✍️ Schreiben"])
 
