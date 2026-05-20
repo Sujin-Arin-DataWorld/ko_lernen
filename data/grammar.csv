@@ -1,0 +1,31 @@
+pattern,level,type_de,explanation_de,example_korean,example_german,note
+N은/는,A1,Thema-Partikel,Markiert das Satzthema. Nach Konsonant: 은 · Nach Vokal: 는,저는 학생이에요.,Ich bin Student.,은 nach Konsonant · 는 nach Vokal
+N이/가,A1,Subjekt-Partikel,Markiert das Subjekt. Nach Konsonant: 이 · Nach Vokal: 가,친구가 와요.,Ein Freund kommt.,이 nach Konsonant · 가 nach Vokal
+N을/를,A1,Objekt-Partikel,Markiert das direkte Objekt. Nach Konsonant: 을 · Nach Vokal: 를,밥을 먹어요.,Ich esse Reis.,을 nach Konsonant · 를 nach Vokal
+N에,A1,Richtungs-/Ortspartikel,Richtung (wohin?) oder Zeit (wann?),학교에 가요.,Ich gehe zur Schule.,Richtung oder Zeitpunkt
+N에서,A1,Handlungsort-Partikel,Ort der Handlung (wo findet etwas statt?),집에서 먹어요.,Ich esse zuhause.,Ort einer Handlung
+N이에요/예요,A1,Kopula (sein),Nach Konsonant: 이에요 · Nach Vokal: 예요,학생이에요.,Ich bin Student.,이에요 nach Konsonant · 예요 nach Vokal
+V-아/어요,A1,Höfliche Gegenwart,Höfliche Gegenwartsform. Vokal ㅏ/ㅗ → 아요 · Sonst → 어요 · 하다 → 해요,먹어요.,Ich esse.,하다-Verben werden zu 해요
+V-았/었어요,A1,Höfliche Vergangenheit,Höfliche Vergangenheitsform. ㅏ/ㅗ → 았어요 · Sonst → 었어요 · 하다 → 했어요,먹었어요.,Ich habe gegessen.,하다 → 했어요
+V-고 싶다,A1,Wunschform,Wunsch ausdrücken: möchten (etwas tun wollen),한국에 가고 싶어요.,Ich möchte nach Korea gehen.,Verb-Stamm + 고 싶어요
+V-(으)세요,A1,Höfliche Aufforderung,Höfliche Aufforderung. Nach Konsonant: 으세요 · Nach Vokal: 세요,앉으세요.,Bitte setzen Sie sich.,Imperativ-Höflichkeitsform
+N도,A1,Inklusiv-Partikel,Auch / Ebenfalls,저도 학생이에요.,Ich bin auch Student.,Ersetzt 은/는 이/가 을/를
+N의,A1,Genitiv-Partikel,Besitz / Zugehörigkeit: von / -s,제 친구의 이름이에요.,Das ist der Name meines Freundes.,Oft weggelassen in der Umgangssprache
+V-(으)ㄹ 거예요,A2,Zukunft / Absicht,Zukünftige Handlung oder Absicht ausdrücken,내일 공부할 거예요.,Ich werde morgen lernen.,Zukunftsform
+V-(으)면,A2,Konditionalsatz,Wenn/Falls-Bedingung,비가 오면 집에 있어요.,Wenn es regnet bleibe ich zuhause.,Bedingung
+V-지만,A2,Konzessiv,Gegensatz: aber / obwohl,비싸지만 사요.,Obwohl es teuer ist kaufe ich es.,Gegensatz im gleichen Satz
+V-아/어서,A2,Grund / Reihenfolge,Weil (Grund) oder und dann (zeitliche Abfolge),배가 고파서 먹어요.,Ich esse weil ich hungrig bin.,Kein Tempuswechsel möglich
+V-고 있다,A2,Verlaufsform,Etwas gerade tun (Progressiv),지금 공부하고 있어요.,Ich lerne gerade.,Verb + 고 있어요
+N한테/에게,A2,Dativ-Partikel Person,Jemandem (Dativ). 한테 = informell · 에게 = formell,친구한테 줬어요.,Ich habe es meinem Freund gegeben.,한테 umgangssprachlich · 에게 formell
+V-(으)ㄹ 수 있다/없다,A2,Können / Nicht können,Fähigkeit oder Möglichkeit ausdrücken,한국어를 할 수 있어요.,Ich kann Koreanisch sprechen.,있다 = können · 없다 = nicht können
+V-아/어 보다,A2,Versuch / Erfahrung,Etwas ausprobieren oder erfahren haben,한국 음식을 먹어 봤어요?,Hast du schon mal koreanisches Essen probiert?,한번 해 봐요! = Versuch es mal!
+V-는 것,B1,Nominalisierung,Verb in ein Nomen umwandeln (das Tun von etwas),공부하는 것이 중요해요.,Lernen ist wichtig.,Verb wird zum Nomen
+V-(으)ㄴ 후에,B1,Zeitabfolge (nachdem),Nachdem etwas getan wurde,밥을 먹은 후에 공부해요.,Nach dem Essen lerne ich.,Vergangenheit + 후에
+V-기 전에,B1,Zeitabfolge (bevor),Bevor etwas getan wird,자기 전에 책을 읽어요.,Vor dem Schlafen lese ich ein Buch.,Infinitiv + 전에
+V-(으)려고,B1,Absicht / Ziel,Um zu (Ziel einer Handlung),한국어를 배우려고 왔어요.,Ich bin gekommen um Koreanisch zu lernen.,Absicht / Ziel
+V-아/어야 하다,B1,Obligation,Müssen / Sollen (Pflicht oder Notwendigkeit),공부해야 해요.,Ich muss lernen.,Notwendigkeit
+V-는데,B1,Hintergrund / Kontrast,Hintergrund geben oder milden Kontrast ausdrücken,비가 오는데 우산이 없어요.,Es regnet aber ich habe keinen Regenschirm.,Sehr häufig in der Umgangssprache
+V-더라도,B2,Konzessiv (selbst wenn),Auch wenn / Selbst wenn (trotzdem),어렵더라도 포기하지 마세요.,Auch wenn es schwer ist gib nicht auf.,Stärker als -지만
+V-(으)ㄹ 뿐만 아니라,B2,Addition (nicht nur),Nicht nur ... sondern auch,예쁠 뿐만 아니라 똑똑해요.,Sie ist nicht nur hübsch sondern auch klug.,Erweiterung des Gedankens
+V-는 한,B2,Bedingung (solange),Solange (eine Bedingung erfüllt bleibt),노력하는 한 발전할 수 있어요.,Solange du dich anstrengst kannst du Fortschritte machen.,Andauernde Bedingung
+N에 따라,B2,Konditional (je nach),Je nach / Abhängig von,상황에 따라 달라요.,Es hängt von der Situation ab.,Variabilität ausdrücken
