@@ -40,7 +40,22 @@ st.markdown("""
 .card-grammar { border:2px solid #f59f00; background:linear-gradient(135deg,#fff9db,#ffec99); color:#7d4a00; }
 .card-listen  { border:2px solid #51cf66; background:linear-gradient(135deg,#ebfbee,#d3f9d8); color:#2b8a3e; }
 
-/* ── 레벨 핍 버튼 ── */
+/* ── 레벨 뱃지 카드 ── */
+.level-summary {
+    display: flex; align-items: center; gap: .8rem;
+    background: linear-gradient(135deg,#f3f0ff,#e5dbff);
+    border: 1.5px solid #845ef7; border-radius: 14px;
+    padding: .85rem 1.1rem; margin-bottom: .5rem;
+}
+.level-badge {
+    background: #845ef7; color: #fff;
+    border-radius: 8px; padding: .3rem .7rem;
+    font-size: 1.05rem; font-weight: 800; white-space: nowrap;
+}
+.level-meta { color: #5f3dc4; font-size: .88rem; line-height: 1.4; }
+.level-meta strong { font-size: 1rem; }
+
+/* ── 레벨 핍 버튼 (expander 안) ── */
 div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > button {
     width:44px !important; height:44px !important; border-radius:50% !important;
     padding:0 !important; font-size:.85rem !important; font-weight:700 !important;
@@ -49,10 +64,12 @@ div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > bu
 .lvlmark { display:none; }
 .lvl-cap { text-align:center; font-size:.78rem; font-weight:700; margin-top:4px; }
 
-/* ── 모바일: 카드 full-width ── */
+/* ── 모바일 ── */
 @media (max-width: 640px) {
     .home-card h2 { font-size: 1.05rem; }
     .home-card p  { font-size: .85rem; }
+    .level-summary { padding: .7rem .9rem; gap: .6rem; }
+    .level-badge { font-size: .95rem; }
     div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > button {
         width:40px !important; height:40px !important; font-size:.75rem !important;
     }
@@ -69,12 +86,21 @@ st.caption("Dein persönlicher Koreanisch-Trainer · A1.1 → B2 · Viel Erfolg!
 st.markdown("---")
 
 # ── Level-Fortschritt ─────────────────────────────────────────────────────────
-st.subheader("📊 Dein Fortschritt")
-st.caption("Klicke ein Level an, um es als aktuell zu markieren")
-
 LEVELS = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2"]
 st.session_state.setdefault("current_level_idx", 0)
 current = st.session_state.current_level_idx
+
+pct = int((current + 1) / len(LEVELS) * 100)
+st.markdown(f"""
+<div class="level-summary">
+  <div class="level-badge">📍 {LEVELS[current]}</div>
+  <div class="level-meta">
+    <strong>Dein Fortschritt</strong><br>
+    Level {current + 1} von {len(LEVELS)} · {pct} % abgeschlossen
+  </div>
+</div>
+""", unsafe_allow_html=True)
+st.progress((current + 0.5) / len(LEVELS))
 
 def _render_pip_row(indices):
     st.markdown('<div class="lvlmark"></div>', unsafe_allow_html=True)
@@ -92,10 +118,9 @@ def _render_pip_row(indices):
             st.rerun()
         col.markdown(f'<div class="lvl-cap" style="color:{color}">{lvl}</div>', unsafe_allow_html=True)
 
-_render_pip_row(range(4))   # A1.1 ~ A2.2
-_render_pip_row(range(4, 8)) # B1.1 ~ B2
-
-st.progress((current + 0.5) / len(LEVELS))
+with st.expander("✏️ Level ändern"):
+    _render_pip_row(range(4))
+    _render_pip_row(range(4, 8))
 
 # ── Heutige Statistik ─────────────────────────────────────────────────────────
 st.markdown("---")
