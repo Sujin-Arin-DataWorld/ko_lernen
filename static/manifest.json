@@ -2,8 +2,8 @@
   "name": "Koreanisch lernen — 한국어",
   "short_name": "한국어",
   "description": "Persönlicher Koreanisch-Trainer für A1 bis B2 — Hangul, Vokabeln, Grammatik, Hören",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "https://wilkommen-schatziya.streamlit.app/",
+  "scope": "https://wilkommen-schatziya.streamlit.app/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#0f1419",
@@ -12,9 +12,15 @@
   "categories": ["education", "books"],
   "icons": [
     {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "https://raw.githubusercontent.com/Sujin-Arin-DataWorld/ko_lernen/main/static/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/Sujin-Arin-DataWorld/ko_lernen/main/static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
