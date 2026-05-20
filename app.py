@@ -36,6 +36,14 @@ st.markdown("""
 .card-listen  { border:2px solid #51cf66; background:linear-gradient(135deg,#ebfbee,#d3f9d8); color:#2b8a3e; }
 .level-pip { display:inline-block; width:28px; height:28px; border-radius:50%;
              line-height:28px; text-align:center; font-size:.75rem; font-weight:700; margin:2px; }
+/* Level-Buttons als runde Pips */
+div[data-testid="stHorizontalBlock"]:has(.lvlmark) [data-testid="stButton"] > button {
+    width:42px !important; height:42px !important; border-radius:50% !important;
+    padding:0 !important; font-size:.8rem !important; font-weight:700 !important;
+    margin:0 auto !important; display:block !important;
+}
+.lvlmark { display:none; }
+.lvl-cap { text-align:center; font-size:.78rem; font-weight:700; margin-top:4px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -48,18 +56,25 @@ st.markdown("---")
 
 # ── Level-Fortschritt ─────────────────────────────────────────────────────────
 st.subheader("📊 Dein Fortschritt")
+st.caption("Klicke ein Level an, um es als aktuell zu markieren")
 
 LEVELS = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2"]
-current = 0  # A1.1 — hier später aus DB/State aktualisieren
+st.session_state.setdefault("current_level_idx", 0)
+current = st.session_state.current_level_idx
 
+st.markdown('<div class="lvlmark"></div>', unsafe_allow_html=True)
 cols = st.columns(len(LEVELS))
 for i, (col, lvl) in enumerate(zip(cols, LEVELS)):
     if i < current:
-        col.markdown(f'<div class="level-pip" style="background:#51cf66;color:white">✓</div><div style="text-align:center;font-size:.8rem;color:#51cf66;font-weight:700">{lvl}</div>', unsafe_allow_html=True)
+        label, color = "✓", "#51cf66"
     elif i == current:
-        col.markdown(f'<div class="level-pip" style="background:linear-gradient(135deg,#cc5de8,#845ef7);color:white">📍</div><div style="text-align:center;font-size:.8rem;font-weight:700;color:#845ef7">{lvl}</div>', unsafe_allow_html=True)
+        label, color = "📍", "#845ef7"
     else:
-        col.markdown(f'<div class="level-pip" style="background:#e9ecef;color:#adb5bd">·</div><div style="text-align:center;font-size:.8rem;color:#adb5bd">{lvl}</div>', unsafe_allow_html=True)
+        label, color = "·", "#adb5bd"
+    if col.button(label, key=f"lvl_{i}", help=f"Auf {lvl} setzen"):
+        st.session_state.current_level_idx = i
+        st.rerun()
+    col.markdown(f'<div class="lvl-cap" style="color:{color}">{lvl}</div>', unsafe_allow_html=True)
 
 st.progress((current + 0.5) / len(LEVELS))
 
