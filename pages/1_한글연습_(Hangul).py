@@ -466,7 +466,9 @@ canvas{border:2px solid #dee2e6;border-radius:12px;display:block;max-width:100%;
   .clabel{font-size:.82rem}
   .char-disp{font-size:1.05rem}
   .sbtn{font-size:.78rem;padding:4px 8px}
-  .cnavbtn{font-size:.82rem;padding:5px 10px}
+  .cnav{gap:6px;margin-top:10px}
+  .cnavbtn{font-size:.88rem;padding:10px 8px;min-height:44px}
+  .cur-char-label{font-size:.95rem;flex:0 0 64px;min-width:52px}
 }
 @media (prefers-color-scheme:dark){
   body{color:#ced4da}
@@ -531,10 +533,11 @@ canvas{border:2px solid #dee2e6;border-radius:12px;display:block;max-width:100%;
   </div>
 </div>
 <style>
-.cnav{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:6px}
-.cnavbtn{padding:5px 14px;border-radius:10px;border:2px solid #dee2e6;background:#fff;cursor:pointer;font-size:.88rem;font-weight:600}
-.cnavbtn:hover{background:#f1f3f5;border-color:#adb5bd}
-.cur-char-label{font-size:1rem;font-weight:700;color:#1864ab;text-align:center;flex:1}
+.cnav{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:8px;padding-bottom:6px}
+.cnavbtn{flex:1;min-height:46px;padding:10px 12px;border-radius:12px;border:2px solid #dee2e6;background:#fff;cursor:pointer;font-size:.95rem;font-weight:700;color:#1864ab;transition:transform .12s,border-color .12s,background .12s}
+.cnavbtn:hover{background:#f1f3f5;border-color:#74c0fc}
+.cnavbtn:active{transform:scale(.96)}
+.cur-char-label{font-size:1.05rem;font-weight:800;color:#1864ab;text-align:center;flex:0 0 78px;min-width:64px}
 .canvas-wrap{position:relative;display:inline-block;line-height:0}
 #praise{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);
   background:rgba(43,138,62,0.95);color:#fff;border-radius:18px;
