@@ -333,67 +333,100 @@ canvas{border:2px solid #dee2e6;border-radius:12px;display:block;max-width:100%;
     <div class="char-disp" style="color:#2b8a3e">Schreibe nach!</div>
     <canvas id="pc" width="220" height="220"></canvas>
     <button class="clrbtn" onclick="clearP()">🗑 Löschen</button>
+    <div class="cnav">
+      <button class="cnavbtn" onclick="navChar(-1)">◀ 이전</button>
+      <span class="cur-char-label" id="cl">1 / 19</span>
+      <button class="cnavbtn" onclick="navChar(1)">다음 ▶</button>
+    </div>
   </div>
 </div>
+<style>
+.cnav{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:6px}
+.cnavbtn{padding:5px 14px;border-radius:10px;border:2px solid #dee2e6;background:#fff;cursor:pointer;font-size:.88rem;font-weight:600}
+.cnavbtn:hover{background:#f1f3f5;border-color:#adb5bd}
+.cur-char-label{font-size:1rem;font-weight:700;color:#1864ab;text-align:center;flex:1}
+#praise{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(43,138,62,0.93);color:#fff;border-radius:20px;
+  padding:18px 36px;font-size:1.9rem;font-weight:700;
+  pointer-events:none;opacity:0;transition:opacity .4s;z-index:999;
+  text-align:center;white-space:nowrap}
+</style>
+<div id="praise">잘했어! 👏</div>
 <script>
 const S={
- 'ㄱ':[{t:'l',p:[[28,62],[162,62]]},{t:'l',p:[[162,62],[162,175]]}],
- 'ㄴ':[{t:'l',p:[[45,30],[45,162]]},{t:'l',p:[[45,162],[175,162]]}],
- 'ㄷ':[{t:'l',p:[[28,42],[165,42]]},{t:'l',p:[[28,42],[28,162]]},{t:'l',p:[[28,162],[165,162]]}],
- 'ㄹ':[{t:'l',p:[[28,40],[162,40]]},{t:'l',p:[[28,40],[28,102]]},{t:'l',p:[[28,102],[162,102]]},{t:'l',p:[[162,102],[162,162]]},{t:'l',p:[[28,162],[162,162]]}],
- 'ㅁ':[{t:'l',p:[[28,40],[162,40]]},{t:'l',p:[[28,40],[28,162]]},{t:'l',p:[[162,40],[162,162]]},{t:'l',p:[[28,162],[162,162]]}],
- 'ㅂ':[{t:'l',p:[[68,40],[68,162]]},{t:'l',p:[[152,40],[152,162]]},{t:'l',p:[[68,40],[152,40]]},{t:'l',p:[[68,101],[152,101]]},{t:'l',p:[[68,162],[152,162]]}],
- 'ㅅ':[{t:'l',p:[[110,38],[42,168]]},{t:'l',p:[[110,38],[178,168]]}],
- 'ㅇ':[{t:'a',cx:110,cy:112,r:62,st:-Math.PI/2,en:Math.PI*3/2}],
- 'ㅈ':[{t:'l',p:[[25,58],[195,58]]},{t:'l',p:[[110,58],[45,170]]},{t:'l',p:[[110,58],[175,170]]}],
- 'ㅊ':[{t:'l',p:[[80,24],[140,24]]},{t:'l',p:[[25,65],[195,65]]},{t:'l',p:[[110,65],[45,172]]},{t:'l',p:[[110,65],[175,172]]}],
- 'ㅋ':[{t:'l',p:[[25,50],[165,50]]},{t:'l',p:[[25,108],[152,108]]},{t:'l',p:[[165,50],[165,175]]}],
- 'ㅌ':[{t:'l',p:[[25,40],[165,40]]},{t:'l',p:[[25,40],[25,165]]},{t:'l',p:[[25,101],[165,101]]},{t:'l',p:[[25,165],[165,165]]}],
- 'ㅍ':[{t:'l',p:[[22,68],[195,68]]},{t:'l',p:[[22,160],[195,160]]},{t:'l',p:[[78,68],[78,160]]},{t:'l',p:[[140,68],[140,160]]}],
- 'ㅎ':[{t:'l',p:[[78,22],[142,22]]},{t:'l',p:[[110,22],[110,48]]},{t:'a',cx:110,cy:118,r:58,st:-Math.PI/2,en:Math.PI*3/2}],
- 'ㄲ':[{t:'l',p:[[15,62],[90,62]]},{t:'l',p:[[90,62],[90,172]]},{t:'l',p:[[100,62],[175,62]]},{t:'l',p:[[175,62],[175,172]]}],
- 'ㄸ':[{t:'l',p:[[12,42],[96,42]]},{t:'l',p:[[12,42],[12,162]]},{t:'l',p:[[12,162],[96,162]]},{t:'l',p:[[106,42],[195,42]]},{t:'l',p:[[106,42],[106,162]]},{t:'l',p:[[106,162],[195,162]]}],
- 'ㅃ':[{t:'l',p:[[12,40],[55,40]]},{t:'l',p:[[12,40],[12,162]]},{t:'l',p:[[55,40],[55,162]]},{t:'l',p:[[12,101],[55,101]]},{t:'l',p:[[12,162],[55,162]]},{t:'l',p:[[65,40],[108,40]]},{t:'l',p:[[65,40],[65,162]]},{t:'l',p:[[108,40],[108,162]]},{t:'l',p:[[65,101],[108,101]]},{t:'l',p:[[65,162],[108,162]]}],
- 'ㅆ':[{t:'l',p:[[70,38],[30,162]]},{t:'l',p:[[70,38],[110,162]]},{t:'l',p:[[148,38],[108,162]]},{t:'l',p:[[148,38],[188,162]]}],
- 'ㅉ':[{t:'l',p:[[12,58],[108,58]]},{t:'l',p:[[60,58],[22,168]]},{t:'l',p:[[60,58],[98,168]]},{t:'l',p:[[112,58],[208,58]]},{t:'l',p:[[160,58],[122,168]]},{t:'l',p:[[160,58],[198,168]]}],
- 'ㅏ':[{t:'l',p:[[100,25],[100,195]]},{t:'l',p:[[100,110],[168,110]]}],
- 'ㅑ':[{t:'l',p:[[100,25],[100,195]]},{t:'l',p:[[100,75],[168,75]]},{t:'l',p:[[100,135],[168,135]]}],
- 'ㅓ':[{t:'l',p:[[110,25],[110,195]]},{t:'l',p:[[42,110],[110,110]]}],
- 'ㅕ':[{t:'l',p:[[110,25],[110,195]]},{t:'l',p:[[42,75],[110,75]]},{t:'l',p:[[42,135],[110,135]]}],
- 'ㅗ':[{t:'l',p:[[22,100],[195,100]]},{t:'l',p:[[108,100],[108,185]]}],
- 'ㅛ':[{t:'l',p:[[22,100],[195,100]]},{t:'l',p:[[72,100],[72,185]]},{t:'l',p:[[145,100],[145,185]]}],
- 'ㅜ':[{t:'l',p:[[22,110],[195,110]]},{t:'l',p:[[108,25],[108,110]]}],
- 'ㅠ':[{t:'l',p:[[22,110],[195,110]]},{t:'l',p:[[72,25],[72,110]]},{t:'l',p:[[145,25],[145,110]]}],
+ 'ㄱ':[{t:'l',p:[[30,55],[172,55],[172,178]]}],
+ 'ㄴ':[{t:'l',p:[[42,28],[42,170],[178,170]]}],
+ 'ㄷ':[{t:'l',p:[[35,42],[175,42]]},{t:'l',p:[[35,42],[35,168],[175,168]]}],
+ 'ㄹ':[{t:'l',p:[[35,42],[170,42],[170,110]]},{t:'l',p:[[35,110],[170,110]]},{t:'l',p:[[35,112],[35,175],[170,175]]}],
+ 'ㅁ':[{t:'l',p:[[42,42],[42,175]]},{t:'l',p:[[42,42],[172,42],[172,175]]},{t:'l',p:[[42,175],[172,175]]}],
+ 'ㅂ':[{t:'l',p:[[62,38],[62,178]]},{t:'l',p:[[152,38],[152,178]]},{t:'l',p:[[62,38],[152,38]]},{t:'l',p:[[62,108],[152,108]]}],
+ 'ㅅ':[{t:'l',p:[[110,40],[42,172]]},{t:'l',p:[[110,40],[178,172]]}],
+ 'ㅇ':[{t:'c',cx:110,cy:110,r:68}],
+ 'ㅈ':[{t:'l',p:[[28,60],[192,60]]},{t:'l',p:[[110,60],[45,172]]},{t:'l',p:[[110,60],[175,172]]}],
+ 'ㅊ':[{t:'l',p:[[85,26],[135,26]]},{t:'l',p:[[28,60],[192,60]]},{t:'l',p:[[110,60],[45,172]]},{t:'l',p:[[110,60],[175,172]]}],
+ 'ㅋ':[{t:'l',p:[[30,55],[172,55],[172,178]]},{t:'l',p:[[30,116],[158,116]]}],
+ 'ㅌ':[{t:'l',p:[[30,42],[175,42]]},{t:'l',p:[[30,42],[30,172],[175,172]]},{t:'l',p:[[30,107],[175,107]]}],
+ 'ㅍ':[{t:'l',p:[[25,65],[192,65]]},{t:'l',p:[[68,65],[68,162]]},{t:'l',p:[[148,65],[148,162]]},{t:'l',p:[[25,162],[192,162]]}],
+ 'ㅎ':[{t:'l',p:[[88,22],[130,22]]},{t:'l',p:[[40,55],[178,55]]},{t:'c',cx:110,cy:136,r:52}],
+ 'ㄲ':[{t:'l',p:[[18,60],[88,60],[88,172]]},{t:'l',p:[[108,60],[178,60],[178,172]]}],
+ 'ㄸ':[{t:'l',p:[[12,42],[88,42]]},{t:'l',p:[[12,42],[12,165],[88,165]]},{t:'l',p:[[102,42],[178,42]]},{t:'l',p:[[102,42],[102,165],[178,165]]}],
+ 'ㅃ':[{t:'l',p:[[12,38],[12,178]]},{t:'l',p:[[55,38],[55,178]]},{t:'l',p:[[12,38],[55,38]]},{t:'l',p:[[12,108],[55,108]]},{t:'l',p:[[68,38],[68,178]]},{t:'l',p:[[111,38],[111,178]]},{t:'l',p:[[68,38],[111,38]]},{t:'l',p:[[68,108],[111,108]]}],
+ 'ㅆ':[{t:'l',p:[[70,40],[30,165]]},{t:'l',p:[[70,40],[110,165]]},{t:'l',p:[[148,40],[108,165]]},{t:'l',p:[[148,40],[188,165]]}],
+ 'ㅉ':[{t:'l',p:[[15,60],[95,60]]},{t:'l',p:[[55,60],[22,165]]},{t:'l',p:[[55,60],[88,165]]},{t:'l',p:[[105,60],[192,60]]},{t:'l',p:[[148,60],[115,165]]},{t:'l',p:[[148,60],[182,165]]}],
+ 'ㅏ':[{t:'l',p:[[88,25],[88,195]]},{t:'l',p:[[88,110],[158,110]]}],
+ 'ㅑ':[{t:'l',p:[[88,25],[88,195]]},{t:'l',p:[[88,78],[158,78]]},{t:'l',p:[[88,138],[158,138]]}],
+ 'ㅓ':[{t:'l',p:[[48,110],[118,110]]},{t:'l',p:[[118,25],[118,195]]}],
+ 'ㅕ':[{t:'l',p:[[48,78],[118,78]]},{t:'l',p:[[48,138],[118,138]]},{t:'l',p:[[118,25],[118,195]]}],
+ 'ㅗ':[{t:'l',p:[[110,42],[110,118]]},{t:'l',p:[[25,118],[195,118]]}],
+ 'ㅛ':[{t:'l',p:[[75,42],[75,118]]},{t:'l',p:[[145,42],[145,118]]},{t:'l',p:[[25,118],[195,118]]}],
+ 'ㅜ':[{t:'l',p:[[25,95],[195,95]]},{t:'l',p:[[110,95],[110,178]]}],
+ 'ㅠ':[{t:'l',p:[[25,95],[195,95]]},{t:'l',p:[[75,95],[75,178]]},{t:'l',p:[[145,95],[145,178]]}],
  'ㅡ':[{t:'l',p:[[22,110],[195,110]]}],
- 'ㅣ':[{t:'l',p:[[110,25],[110,195]]}],
- 'ㅐ':[{t:'l',p:[[78,25],[78,195]]},{t:'l',p:[[78,110],[145,110]]},{t:'l',p:[[145,25],[145,195]]}],
- 'ㅔ':[{t:'l',p:[[78,25],[78,195]]},{t:'l',p:[[42,110],[78,110]]},{t:'l',p:[[145,25],[145,195]]}],
- 'ㅘ':[{t:'l',p:[[22,100],[95,100]]},{t:'l',p:[[58,100],[58,185]]},{t:'l',p:[[95,25],[95,195]]},{t:'l',p:[[95,110],[165,110]]}],
- 'ㅝ':[{t:'l',p:[[22,110],[95,110]]},{t:'l',p:[[58,25],[58,110]]},{t:'l',p:[[95,25],[95,195]]},{t:'l',p:[[35,110],[95,110]]}],
- 'ㅢ':[{t:'l',p:[[22,110],[195,110]]},{t:'l',p:[[108,25],[108,195]]}],
+ 'ㅣ':[{t:'l',p:[[110,22],[110,195]]}],
+ 'ㅐ':[{t:'l',p:[[72,25],[72,195]]},{t:'l',p:[[72,110],[145,110]]},{t:'l',p:[[145,25],[145,195]]}],
+ 'ㅔ':[{t:'l',p:[[42,110],[115,110]]},{t:'l',p:[[115,25],[115,195]]},{t:'l',p:[[155,25],[155,195]]}],
+ 'ㅘ':[{t:'l',p:[[60,42],[60,108]]},{t:'l',p:[[22,108],[125,108]]},{t:'l',p:[[125,25],[125,195]]},{t:'l',p:[[125,110],[188,110]]}],
+ 'ㅝ':[{t:'l',p:[[22,92],[120,92]]},{t:'l',p:[[70,92],[70,165]]},{t:'l',p:[[48,118],[120,118]]},{t:'l',p:[[120,25],[120,195]]}],
+ 'ㅢ':[{t:'l',p:[[22,110],[195,110]]},{t:'l',p:[[155,25],[155,195]]}],
 };
 const CON=['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ','ㄲ','ㄸ','ㅃ','ㅆ','ㅉ'];
 const VOW=['ㅏ','ㅑ','ㅓ','ㅕ','ㅗ','ㅛ','ㅜ','ㅠ','ㅡ','ㅣ','ㅐ','ㅔ','ㅘ','ㅝ','ㅢ'];
-let cur='ㄱ',curS=0,animT=null;
+let cur='ㄱ',curS=0,animT=null,curList=CON,drawDist=0;
 const dc=document.getElementById('dc'),dctx=dc.getContext('2d');
 const pc=document.getElementById('pc'),pctx=pc.getContext('2d');
-
+const praiseEl=document.getElementById('praise');
+let praiseT=null;
+function showPraise(){
+  praiseEl.style.opacity='1';
+  if(praiseT)clearTimeout(praiseT);
+  praiseT=setTimeout(()=>{praiseEl.style.opacity='0';},1800);
+}
 function setMode(m,btn){
   document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  curList=m==='c'?CON:VOW;
   const cg=document.getElementById('cg');cg.innerHTML='';
-  (m==='c'?CON:VOW).forEach(ch=>{
+  curList.forEach(ch=>{
     const b=document.createElement('button');
     b.className='cbtn'+(ch===cur?' sel':'');
     b.textContent=ch;b.onclick=()=>selChar(ch);
     cg.appendChild(b);
   });
+  updateCharLabel();
 }
 function selChar(ch){
-  cur=ch;curS=0;if(animT){clearTimeout(animT);animT=null;}
+  cur=ch;curS=0;drawDist=0;if(animT){clearTimeout(animT);animT=null;}
   document.querySelectorAll('.cbtn').forEach(b=>b.classList.toggle('sel',b.textContent===ch));
   document.getElementById('cd').textContent=ch;
-  drawD();updateSI();drawGuide();
+  drawD();updateSI();drawGuide();updateCharLabel();
+}
+function navChar(d){
+  const i=curList.indexOf(cur);
+  selChar(curList[(i+d+curList.length)%curList.length]);
+}
+function updateCharLabel(){
+  const i=curList.indexOf(cur);
+  document.getElementById('cl').textContent=(i+1)+' / '+curList.length;
 }
 function drawStroke(ctx,sk,color,lw){
   ctx.strokeStyle=color;ctx.lineWidth=lw||9;ctx.lineCap='round';ctx.lineJoin='round';
@@ -402,7 +435,7 @@ function drawStroke(ctx,sk,color,lw){
     for(let i=1;i<sk.p.length;i++)ctx.lineTo(sk.p[i][0],sk.p[i][1]);
     ctx.stroke();
   } else {
-    ctx.beginPath();ctx.arc(sk.cx,sk.cy,sk.r,sk.st,sk.en,false);ctx.stroke();
+    ctx.beginPath();ctx.arc(sk.cx,sk.cy,sk.r,-Math.PI/2,3*Math.PI/2,true);ctx.stroke();
   }
 }
 function drawNum(ctx,sk,n,c){
@@ -450,22 +483,27 @@ function animAll(){
   animT=setTimeout(step,350);
 }
 function drawGuide(){
-  pctx.clearRect(0,0,220,220);drawGhost(pctx,cur,0.08,'#51cf66');
+  pctx.clearRect(0,0,220,220);drawGhost(pctx,cur,0.08,'#51cf66');drawDist=0;
 }
 function clearP(){drawGuide();}
 // Drawing
 let drw=false,lx=0,ly=0;
+const PRAISE_DIST=280;
 function pos(e,cvs){
   const r=cvs.getBoundingClientRect(),sx=cvs.width/r.width,sy=cvs.height/r.height;
   if(e.touches)return{x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
   return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
+}
+function addDist(p){
+  drawDist+=Math.hypot(p.x-lx,p.y-ly);
+  if(drawDist>=PRAISE_DIST){showPraise();drawDist=0;}
 }
 pc.addEventListener('mousedown',e=>{drw=true;const p=pos(e,pc);lx=p.x;ly=p.y;});
 pc.addEventListener('mousemove',e=>{
   if(!drw)return;const p=pos(e,pc);
   pctx.strokeStyle='#2b8a3e';pctx.lineWidth=9;pctx.lineCap='round';
   pctx.beginPath();pctx.moveTo(lx,ly);pctx.lineTo(p.x,p.y);pctx.stroke();
-  lx=p.x;ly=p.y;
+  addDist(p);lx=p.x;ly=p.y;
 });
 pc.addEventListener('mouseup',()=>drw=false);
 pc.addEventListener('mouseleave',()=>drw=false);
@@ -474,11 +512,23 @@ pc.addEventListener('touchmove',e=>{
   e.preventDefault();if(!drw)return;const p=pos(e,pc);
   pctx.strokeStyle='#2b8a3e';pctx.lineWidth=9;pctx.lineCap='round';
   pctx.beginPath();pctx.moveTo(lx,ly);pctx.lineTo(p.x,p.y);pctx.stroke();
-  lx=p.x;ly=p.y;
+  addDist(p);lx=p.x;ly=p.y;
 },{passive:false});
 pc.addEventListener('touchend',()=>drw=false);
+// Swipe navigation between characters (skip if touch starts on practice canvas)
+let swipeX=0,swipeY=0;
+document.addEventListener('touchstart',e=>{
+  if(e.target===pc)return;
+  swipeX=e.touches[0].clientX;swipeY=e.touches[0].clientY;
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(e.target===pc)return;
+  const dx=e.changedTouches[0].clientX-swipeX;
+  const dy=e.changedTouches[0].clientY-swipeY;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)navChar(dx<0?1:-1);
+},{passive:true});
 // Init
 setMode('c',document.getElementById('btn-con'));selChar('ㄱ');
 </script></body></html>"""
 
-    components.html(STROKE_HTML, height=860, scrolling=True)
+    components.html(STROKE_HTML, height=910, scrolling=True)
